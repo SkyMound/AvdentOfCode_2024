@@ -6,7 +6,7 @@ class Program
 {
     static async Task Main(string[] args)
     {
-        AdventDay daySolver = new Day1();
+        AdventDay daySolver = new Day1Part2();
         await daySolver.Run();
     }
 }

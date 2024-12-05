@@ -6,8 +6,8 @@ public abstract class AdventDay
 {
     public abstract int DayNumber {get;}
     private string InputPathURL {get => "https://adventofcode.com/2024/day/"+DayNumber.ToString()+"/input";} 
-    private string DefaultFilePath {get => "D:\\2 CREATION\\AoC2024\\AdventOfCode2024\\Calendar\\Inputs\\"+DayNumber.ToString()+".txt";} 
-    protected abstract string InternalRun(InputHandler input);
+    private string DefaultFilePath {get => "C:\\Users\\tfresard\\Root\\projects\\AvdentOfCode_2024\\AdventOfCode2024\\Calendar\\Inputs\\"+DayNumber.ToString()+".txt";} 
+    protected abstract string InternalRun(string input);
 
     public async Task<string> Run(string inputFilePath = "")
     {
@@ -41,11 +41,18 @@ public abstract class AdventDay
             return string.Empty;
         }
 
-        string[] inputData = await File.ReadAllLinesAsync(inputFilePath); 
+        string inputData = await File.ReadAllTextAsync(path); 
 
-        Console.WriteLine(inputData[0]);
+        DateTime startTime = DateTime.Now;
         
-        return InternalRun(new InputHandler(inputData[0]));
+        string result = InternalRun(inputData);
+        Console.WriteLine(result);
+        
+        TimeSpan executionTime = DateTime.Now - startTime;
+
+        Console.WriteLine("Took " + executionTime.ToString());
+
+        return result;
     }
 
 }
