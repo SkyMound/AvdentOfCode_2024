@@ -1,12 +1,50 @@
-using System;
 
-namespace AdventOfCode2024.Calendar._6;
+namespace AdventOfCode2024.Calendar;
 
-public class Day6Part2 : AdventDay
+public class Day6 : IDayProblem
 {
-    public override int DayNumber => 6;
+    static int IDayProblem.Day => 6;
 
-    protected override string InternalRun(string input)
+    public static string SolvePart1(string input)
+    {
+        int labWidth = input.IndexOf('\n') - 1;
+        string labMap = input.Replace("\n", "").Replace("\r", "");
+        int currentGuardPosition = labMap.IndexOf('^');
+        int currentFacingDirection = 0;
+        
+        int[] forwardStepDirectionDependent = [-labWidth, 1, labWidth, -1]; // up, right, down, left
+        HashSet<int> visitedPositions = [currentGuardPosition];
+        bool isOutOfLab = false;
+
+        while(!isOutOfLab)
+        {
+            int nextGuardPosition = currentGuardPosition + forwardStepDirectionDependent[currentFacingDirection];
+
+            int currentRow = currentGuardPosition/labWidth;
+            int nextRow = nextGuardPosition/labWidth;
+
+            if (nextGuardPosition < 0 || nextGuardPosition >= labMap.Length)
+                isOutOfLab = true;
+
+            if (currentFacingDirection == 1 || currentFacingDirection == 3)
+                if(currentRow != nextRow)
+                    isOutOfLab = true;
+            
+            if(!isOutOfLab)
+            {
+                if(labMap[nextGuardPosition] == '#')
+                    currentFacingDirection = (currentFacingDirection + 1)%4;
+                else
+                    currentGuardPosition = nextGuardPosition;
+                
+                visitedPositions.Add(currentGuardPosition);
+            }
+        }
+
+        return visitedPositions.Count.ToString();
+    }
+
+    public static string SolvePart2(string input)
     {
         int labWidth = input.IndexOf('\n') - 1;
         string labMap = input.Replace("\n", "").Replace("\r", "");
