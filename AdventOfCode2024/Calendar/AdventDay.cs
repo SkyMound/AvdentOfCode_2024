@@ -6,7 +6,7 @@ public abstract class AdventDay
 {
     public abstract int DayNumber {get;}
     private string InputPathURL {get => "https://adventofcode.com/2024/day/"+DayNumber.ToString()+"/input";} 
-    private string DefaultFilePath {get => "C:\\Users\\tfresard\\Root\\projects\\AvdentOfCode_2024\\AdventOfCode2024\\Calendar\\Inputs\\"+DayNumber.ToString()+".txt";} 
+    private string DefaultFilePath {get => "D:\\2 CREATION\\AoC2024\\AdventOfCode2024\\Calendar\\Inputs\\"+DayNumber.ToString()+".txt";} 
     protected abstract string InternalRun(string input);
 
     public async Task<string> Run(string inputFilePath = "")
