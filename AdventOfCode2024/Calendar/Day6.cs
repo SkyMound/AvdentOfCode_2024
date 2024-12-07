@@ -103,7 +103,6 @@ public class Day6 : IDayProblem
             char[] labMapChar = labMap.ToCharArray(); 
             labMapChar[obstructionPosition] = '#';
             bool isOutOfLab2 = false;
-            Console.WriteLine(obstructionPosition);
 
             while(!isOutOfLab2)
             {
@@ -134,7 +133,6 @@ public class Day6 : IDayProblem
 
                         labMapChar[currentGuardPosition2] = (char)currentFacingDirection2;
                         currentGuardPosition2 = nextGuardPosition;
-                        
                     }
                 }
             }
