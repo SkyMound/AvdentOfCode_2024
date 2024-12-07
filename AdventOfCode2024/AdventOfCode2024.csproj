@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Include all files in the Resources folder -->
+    <None Include="Inputs\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

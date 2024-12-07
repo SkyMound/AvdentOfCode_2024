@@ -1,12 +1,12 @@
 using System;
 
-namespace AdventOfCode2024.Calendar._2;
+namespace AdventOfCode2024.Calendar;
 
-public class Day2 : AdventDay
+public class Day2 : IDayProblem
 {
-    public override int DayNumber => 2;
+    public static int Day => 2;
 
-    protected override string InternalRun(string input)
+    public static string SolvePart1(string input)
     {
         int[][] reports = input.Split("\n").Select(str => str.Split(" ").Select(int.Parse).ToArray()).ToArray();
 
@@ -38,5 +38,10 @@ public class Day2 : AdventDay
 
         }
         return safeNumber.ToString();
+    }
+
+    public static string SolvePart2(string input)
+    {
+        throw new NotImplementedException();
     }
 }

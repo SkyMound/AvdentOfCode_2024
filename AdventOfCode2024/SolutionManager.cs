@@ -10,6 +10,7 @@ public class SolutionManager
     static SolutionManager()
     {
         Register<Day1>();
+        Register<Day2>();
         Register<Day6>();
     }
 
@@ -27,7 +28,7 @@ public class SolutionManager
             return string.Empty;
         }
         
-        string path = "C:\\Users\\tfresard\\Root\\projects\\AvdentOfCode_2024\\AdventOfCode2024\\Inputs\\"+day.ToString()+".txt";
+        string path = "Inputs\\"+day.ToString()+".txt";
 
         if(!File.Exists(path))
         {
