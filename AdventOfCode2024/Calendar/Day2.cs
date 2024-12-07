@@ -10,6 +10,18 @@ public class Day2 : IDayProblem
     {
         int[][] reports = input.Split("\n").Select(str => str.Split(" ").Select(int.Parse).ToArray()).ToArray();
 
+        return CountSafeReports(reports, 0).ToString();
+    }
+
+    public static string SolvePart2(string input)
+    {
+        int[][] reports = input.Split("\n").Select(str => str.Split(" ").Select(int.Parse).ToArray()).ToArray();
+
+        return CountSafeReports(reports, 1).ToString();
+    }
+
+    private static int CountSafeReports(int[][] reports, int nbTolaratedError)
+    {
         int safeNumber = 0;
 
         foreach(int[] report in reports)
@@ -20,28 +32,19 @@ public class Day2 : IDayProblem
                 continue;
             }
 
-            int sign = report[0] - report[1] < 0 ? 1 : -1;
-            bool safeFlag = true;
+            int sign = report[0] - report[1] > 0 ? 1 : -1;
+            int errorSpotted = 0;
             for(int levelIndex = 1; levelIndex < report.Length; ++levelIndex)
             {
-                int adjacentDifference = report[levelIndex -1 ] - report[levelIndex];
+                int adjacentDifference = report[levelIndex -1] - report[levelIndex];
                 if (!(adjacentDifference * sign > 0 && adjacentDifference * sign < 4))
-                {
-                    Console.WriteLine(adjacentDifference);
-                    safeFlag = false;
-                    break;
-                }
+                    ++errorSpotted;
             }
 
-            if(safeFlag)
+            if(errorSpotted <= nbTolaratedError)
                 ++safeNumber;
 
         }
-        return safeNumber.ToString();
-    }
-
-    public static string SolvePart2(string input)
-    {
-        throw new NotImplementedException();
+        return safeNumber;
     }
 }
