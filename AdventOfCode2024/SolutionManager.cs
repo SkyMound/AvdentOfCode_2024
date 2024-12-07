@@ -11,6 +11,7 @@ public class SolutionManager
     {
         Register<Day1>();
         Register<Day2>();
+        Register<Day3>();
         Register<Day6>();
     }
 
@@ -27,7 +28,7 @@ public class SolutionManager
             Console.WriteLine($"No problem registered for day {day}.");
             return string.Empty;
         }
-        
+
         string path = "Inputs\\"+day.ToString()+".txt";
 
         if(!File.Exists(path))
@@ -37,6 +38,8 @@ public class SolutionManager
         }
 
         string inputData = File.ReadAllText(path); 
+
+        Console.WriteLine($"Running Day {day} Part {part}");
 
         DateTime startTime = DateTime.Now;
         
