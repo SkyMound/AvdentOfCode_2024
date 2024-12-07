@@ -13,6 +13,7 @@ public class SolutionManager
         Register<Day2>();
         Register<Day3>();
         Register<Day6>();
+        Register<Day7>();
     }
 
     private static void Register<T>() where T : IDayProblem
@@ -21,7 +22,7 @@ public class SolutionManager
         _problems[(T.Day,2)] = T.SolvePart2;
     }
 
-    public static string Run(int day, int part)
+    public static string Run(int day, int part, string inputFileName = "")
     {
         if (!_problems.TryGetValue((day, part), out var problem))
         {
@@ -29,7 +30,7 @@ public class SolutionManager
             return string.Empty;
         }
 
-        string path = "Inputs\\"+day.ToString()+".txt";
+        string path = "Inputs\\"+ (string.IsNullOrEmpty(inputFileName) ? day.ToString() : inputFileName) +".txt";
 
         if(!File.Exists(path))
         {
