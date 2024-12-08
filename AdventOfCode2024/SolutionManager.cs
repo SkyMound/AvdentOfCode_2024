@@ -13,6 +13,7 @@ public class SolutionManager
         Register<Day2>();
         Register<Day3>();
         Register<Day4>();
+        Register<Day5>();
         Register<Day6>();
         Register<Day7>();
         Register<Day8>();
