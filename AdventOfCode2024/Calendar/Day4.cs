@@ -13,19 +13,21 @@ public class Day4 : IDayProblem
         for (int rowOffset = -1; rowOffset<=1; ++rowOffset)
             for (int colOffset = -1; colOffset<=1; ++colOffset)
                 if(!(rowOffset == 0 && colOffset == 0))
-                    nbWord += _WordFinder(wordToFind, lettersBoard, startingLetter, (rowOffset,colOffset));
+                {
+                    int res = _WordFinder(wordToFind, lettersBoard, startingLetter, (rowOffset,colOffset));
+                    nbWord += res;
+                }
         return nbWord;
     }
 
     private static int _WordFinder(string wordToFind, string[] lettersBoard, (int,int) currentLetterPosition, (int,int) directionSearch)
     {
-        ;
+        if (wordToFind.Length==0)
+            return 1;
+
         if (currentLetterPosition.Item1 < 0 || currentLetterPosition.Item2 < 0 || currentLetterPosition.Item1 >= lettersBoard.Length || currentLetterPosition.Item2 >= lettersBoard.Length)
             return 0;
 
-        if (wordToFind.Length==0)
-            return 1;
-        
         if (wordToFind[0] == lettersBoard[currentLetterPosition.Item1][currentLetterPosition.Item2])
             return _WordFinder(wordToFind.Remove(0,1), lettersBoard, (currentLetterPosition.Item1+directionSearch.Item1,currentLetterPosition.Item2+directionSearch.Item2), directionSearch);
         else 
@@ -50,6 +52,19 @@ public class Day4 : IDayProblem
 
     public static string SolvePart2(string input)
     {
-        throw new NotImplementedException();
+        string[] lettersBoard = input.Split('\n');
+
+        int numberWordFind = 0;
+
+        for(int row = 1; row < lettersBoard.Length-1; ++row)
+            for(int col = 1; col<lettersBoard[row].Length-1; ++col)
+                if(lettersBoard[row][col] == 'A')
+                    if((_WordFinder("MAS", lettersBoard, (row-1,col-1),(1,1))==1 && _WordFinder("MAS", lettersBoard, (row-1,col+1),(1,-1))==1)
+                    ||(_WordFinder("MAS", lettersBoard, (row-1,col-1),(1,1))==1 && _WordFinder("MAS", lettersBoard, (row+1,col-1),(-1,1))==1)
+                    ||(_WordFinder("MAS", lettersBoard, (row+1,col+1),(-1,-1))==1 && _WordFinder("MAS", lettersBoard, (row-1,col+1),(1,-1))==1)
+                    ||(_WordFinder("MAS", lettersBoard, (row+1,col+1),(-1,-1))==1 && _WordFinder("MAS", lettersBoard, (row+1,col-1),(-1,1))==1))
+                        numberWordFind += 1;        
+
+        return numberWordFind.ToString();
     }
 }
