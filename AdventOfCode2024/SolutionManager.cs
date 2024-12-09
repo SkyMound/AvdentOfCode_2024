@@ -17,6 +17,7 @@ public class SolutionManager
         Register<Day6>();
         Register<Day7>();
         Register<Day8>();
+        Register<Day9>();
     }
 
     private static void Register<T>() where T : IDayProblem

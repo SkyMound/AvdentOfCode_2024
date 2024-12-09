@@ -5,6 +5,6 @@ class Program
 {
     static void Main()
     {
-        SolutionManager.Run(4, 2);
+        SolutionManager.Run(9, 2);
     }
 }
