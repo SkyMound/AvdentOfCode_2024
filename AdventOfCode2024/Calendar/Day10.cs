@@ -46,9 +46,7 @@ public class Day10 : IDayProblem
             (int,int) newPosition = (position.Item1 + offset.Item1, position.Item2 + offset.Item2);
             if (IsInMap(newPosition,map))
                 if (map[newPosition.Item1][newPosition.Item2] == currentHeight + 1)
-                {
                     score += GetHikingTrailRating(map, newPosition);
-                }
         }
         return score;
     }

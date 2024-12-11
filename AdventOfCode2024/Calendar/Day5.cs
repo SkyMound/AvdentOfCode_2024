@@ -38,7 +38,6 @@ public class Day5 : IDayProblem
         foreach(int[] update in updates)
         {
             bool safeFlag = true;
-            HashSet<int> alreadyPrintedPages = [];
             
             for(int i = 0; i < update.Length; ++i)
             {
@@ -66,7 +65,7 @@ public class Day5 : IDayProblem
 
     public static string SolvePart2(string input)
     {
-                Dictionary<int,HashSet<int>> NeedToBeBefore = []; // Store the pages that need to be before a given one
+        Dictionary<int,HashSet<int>> NeedToBeBefore = []; // Store the pages that need to be before a given one
         List<int[]> updates = [];
 
         string[] lines = input.Split('\n');
@@ -96,7 +95,6 @@ public class Day5 : IDayProblem
         foreach(int[] update in updates)
         {
             bool safeFlag = true;
-            HashSet<int> alreadyPrintedPages = [];
             
             for(int i = 0; i < update.Length; ++i)
             {
@@ -106,9 +104,7 @@ public class Day5 : IDayProblem
                     int pageAfter = update[j];
                     if (NeedToBeBefore.ContainsKey(pageBefore) && NeedToBeBefore[pageBefore].Contains(pageAfter))
                     {
-                        int temp = update[i];
-                        update[i] = update[j];
-                        update[j] = temp;
+                        (update[i], update[j]) = (update[j], update[i]);
                         safeFlag = false;
                     }
                 }
