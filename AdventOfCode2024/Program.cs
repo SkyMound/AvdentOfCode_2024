@@ -7,6 +7,7 @@ class Program
 {
     static void Main()
     {
-        Run<Day11>(Part._2);
+        Run<Day12>(Part._1);
+        Run<Day12>(Part._2);
     }
 }
