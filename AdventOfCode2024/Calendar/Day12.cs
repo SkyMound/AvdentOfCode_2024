@@ -38,43 +38,36 @@ public class Day12 : IDayProblem
         return (area + 1,perimeter);
     }
 
-    private static void AddSides(char[][] mapRegion, char plantType, (int,int) currentGarden,(int,int) sideOrientation, (int,int) direction, HashSet<((int,int),(int,int))> sidePlaced)
-    {
-        if (IsInMap(currentGarden, mapRegion)
-        && plantType == mapRegion[currentGarden.Item1][currentGarden.Item2]
-        &&)
-            
-    }
-
-    private static (int,int) ComputeAreaAndSide(char[][] mapRegion, char plantType, (int,int) currentGarden, HashSet<(int,int)> gardenVisited, HashSet<((int,int),(int,int))> sidePlaced)
+    private static (int,int) ComputeAreaAndSide(char[][] mapRegion, char plantType, (int,int) currentGarden, HashSet<(int,int)> gardenVisited)
     {
         if (gardenVisited.Contains(currentGarden))
             return (0,0);
 
         gardenVisited.Add(currentGarden);
         int area = 0, side = 0;
-        List<(int,int)> possibleGarden = [];
-        foreach( (int,int) offset in OrthogonalOffset)
+        for(int offsetIndex = 0; offsetIndex < OrthogonalOffset.Length; ++offsetIndex)
         {
+            (int,int) offset = OrthogonalOffset[offsetIndex];
+            (int,int) nextOffset = OrthogonalOffset[(offsetIndex+1)%4];
+            (int,int) diagonal = (offset.Item1 + nextOffset.Item1, offset.Item2 + nextOffset.Item2);
+
             (int,int) newGarden = (currentGarden.Item1 + offset.Item1, currentGarden.Item2 + offset.Item2);
+            (int,int) cornerTestGarden = (currentGarden.Item1 + nextOffset.Item1, currentGarden.Item2 + nextOffset.Item2);
+            (int,int) diagonalGarden = (currentGarden.Item1 + diagonal.Item1, currentGarden.Item2 + diagonal.Item2);
+
 
             if(!IsInMap(newGarden, mapRegion) || plantType != mapRegion[newGarden.Item1][newGarden.Item2])
-            {
-                if (!sidePlaced.Contains((currentGarden,offset)))
+                if (!IsInMap(cornerTestGarden, mapRegion) || plantType != mapRegion[cornerTestGarden.Item1][cornerTestGarden.Item2]) // Convex corner check
                     ++side;
-                sidePlaced.Add((currentGarden,offset));
-                sidePlaced.Add(((currentGarden.Item1 + offset.Item2,currentGarden.Item2 + offset.Item1),offset));
-                sidePlaced.Add(((currentGarden.Item1 - offset.Item2,currentGarden.Item2 - offset.Item1),offset));
-            }
             else
-                possibleGarden.Add(newGarden);
-        }
-
-        foreach((int,int) garden in possibleGarden)
-        {
-            (int,int) result = ComputeAreaAndSide(mapRegion, plantType, garden, gardenVisited, sidePlaced);
-            area += result.Item1;
-            side += result.Item2;
+            {
+                if (IsInMap(cornerTestGarden, mapRegion) && plantType == mapRegion[cornerTestGarden.Item1][cornerTestGarden.Item2]
+                && IsInMap(diagonalGarden, mapRegion) && plantType != mapRegion[diagonalGarden.Item1][diagonalGarden.Item2]) // Concave corner check
+                    ++side;
+                (int,int) result = ComputeAreaAndSide(mapRegion, plantType, newGarden, gardenVisited);
+                area += result.Item1;
+                side += result.Item2;
+            }
         }
 
         return (area +1 ,side);
@@ -115,7 +108,7 @@ public class Day12 : IDayProblem
                 if (!gardenPartOfRegion.Contains((row,col)))
                 {
                     HashSet<(int,int)> thisRegion = [];
-                    (int,int) result = ComputeAreaAndSide(regionMap, regionMap[row][col], (row,col), thisRegion, []);
+                    (int,int) result = ComputeAreaAndSide(regionMap, regionMap[row][col], (row,col), thisRegion);
                     Console.WriteLine($"Plant : {regionMap[row][col]} - Area : {result.Item1} - Side : {result.Item2}");
                     price += result.Item1 * result.Item2;
                     gardenPartOfRegion.UnionWith(thisRegion);
