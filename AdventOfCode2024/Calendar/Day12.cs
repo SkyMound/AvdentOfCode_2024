@@ -40,9 +40,9 @@ public class Day12 : IDayProblem
 
     private static void AddSides(char[][] mapRegion, char plantType, (int,int) currentGarden,(int,int) sideOrientation, (int,int) direction, HashSet<((int,int),(int,int))> sidePlaced)
     {
-        if (IsInMap(currentGarden, mapRegion)
-        && plantType == mapRegion[currentGarden.Item1][currentGarden.Item2]
-        &&)
+        // if (IsInMap(currentGarden, mapRegion)
+        // && plantType == mapRegion[currentGarden.Item1][currentGarden.Item2]
+        // &&)
             
     }
 
