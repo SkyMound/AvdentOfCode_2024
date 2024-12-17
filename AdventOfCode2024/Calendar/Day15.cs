@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.Design.Serialization;
 using System.Linq;
 using System.Net.Security;
 using AdventOfCode2024.Common;
@@ -63,7 +64,7 @@ public class Day15 : IDayProblem
     public static string SolvePart2(string input)
     {
         HashSet<Coordinate> walls = [];
-        HashSet<BoxPart> boxes = [];
+        Dictionary<Coordinate,BoxPart> boxes = [];
         Coordinate robot = new(-1,-1);
         string[] lines = input.Split("\n\r")[0].Split('\n');
         for(int row = 0; row < lines.Length; ++row)
@@ -76,31 +77,62 @@ public class Day15 : IDayProblem
                 }
                 if (lines[row][col] == 'O')
                 {
-                    Box box = new()
-                    boxes.Add(new(row,col*2));
-                    boxes.Add(new(row,col*2+1));
+                    BoxPart leftPart = new(new(0,0));
+                    BoxPart rightPart = new(new(0,1));
+                    Box box = new([leftPart, rightPart]);
+                    boxes.Add(new(row,col*2), leftPart);
+                    boxes.Add(new(row,col*2+1), rightPart);
                 }
                 if (lines[row][col] == '@')
                     robot = new(row,col*2);
             }
         Coordinate[] directions = input.Split("\n\r")[1].Where(Direction.ContainsKey).Select(symbol => Direction[symbol]).ToArray();
-
+        foreach (var offset in directions)
+        {
+            Coordinate nextRobotPosition = robot + offset;
+            if (CanMove(nextRobotPosition, offset, walls, boxes))
+            {
+                ApplyBoxMove(nextRobotPosition, offset, boxes, []);
+                robot = nextRobotPosition;
+            }
+        }
+        Coordinate left = new(0,0);
+        return boxes.Where(box=>box.Value.localPosition.Equals(left)).Sum(box => 100*box.Key.Row + box.Key.Col).ToString();
     }
 
-    private static bool TryToPushBox(Box boxToPush, Coordinate position, Coordinate direction, HashSet<Coordinate> walls, HashSet<Coordinate> boxes)
+    private static bool CanMove(Coordinate position, Coordinate direction, HashSet<Coordinate> walls, Dictionary<Coordinate,BoxPart> boxes)
     {
-        Coordinate nextBoxPosition = position + direction;
-
-        if (walls.Contains(nextBoxPosition))
+        if (walls.Contains(position))
             return false;
-            
-        if (boxes.Contains(nextBoxPosition))
-            if (!TryToPushBox(nextBoxPosition, direction, walls, boxes))
-                return false;
+        
+        if (boxes.TryGetValue(position, out var partInFront))
+        {
+            bool pushable = true;
+            foreach(Coordinate otherCollision in partInFront.GetNeighborCoordinates(direction, position))
+                pushable &= CanMove(otherCollision, direction, walls, boxes);
+            return pushable;
+        }
 
-        boxes.Remove(position);
-        boxes.Add(nextBoxPosition);
         return true;
+    }
+
+    private static void ApplyBoxMove(Coordinate position, Coordinate direction, Dictionary<Coordinate,BoxPart> boxes, HashSet<Box> boxMoved)
+    {
+        if (boxes.TryGetValue(position, out var partFocused))
+        {
+            if (!boxMoved.Contains(partFocused.Parent))
+            {
+                boxMoved.Add(partFocused.Parent);
+
+                foreach(Coordinate otherCollision in partFocused.GetNeighborCoordinates(direction, position))
+                    ApplyBoxMove(otherCollision, direction, boxes, boxMoved);
+
+                foreach(BoxPart part in partFocused.Parent.Parts)
+                    boxes.Remove(position - partFocused.localPosition + part.localPosition);
+                foreach(BoxPart part in partFocused.Parent.Parts)
+                    boxes.Add(position - partFocused.localPosition + part.localPosition + direction, part);
+            }
+        }
     }
 
     private static readonly Dictionary<char,Coordinate> Direction = new()
@@ -110,50 +142,6 @@ public class Day15 : IDayProblem
         {'<', new(0,-1)},
         {'^', new(-1,0)}
     };
-
-    // class Box 
-    // {
-    //     public HashSet<Coordinate> shape;
-
-    //     public IEnumerable<Coordinate> GetNeighborCoordinate(Coordinate direction)
-    //     {
-    //         foreach(Coordinate coord in shape)
-    //         {
-    //             Coordinate neighborPos = coord + direction;
-    //             if (!shape.Contains(neighborPos))
-    //                 yield return neighborPos;
-
-    //         }
-    //     }
-    // }
-
-    // class Box
-    // {
-    //     public Coordinate position;
-    //     public List<Box> linkedTo;
-
-    //     public IEnumerable<Box> GetPiece()
-    //     {
-    //         yield return this;
-
-    //         foreach(Box linkedBox in linkedTo)
-    //             foreach(Box linkedBox)
-    //     }
-
-    //     public IEnumerable<Coordinate> GetNeighboorToPiece(Coordinate direction, HashSet<Coordinate> belongsToPiece)
-    //     {
-    //         belongsToPiece.Add(position);
-
-    //         foreach (Box box in linkedTo)
-    //             foreach (Coordinate coord in box.GetNeighboorToPiece(direction, belongsToPiece))
-    //                 if (!belongsToPiece.Contains(coord))
-    //                     yield return coord;
-            
-    //         Coordinate neighbor = position + direction;
-    //         if (!belongsToPiece.Contains(neighbor))
-    //             yield return neighbor;
-    //     }
-    // }    
 
     class Box 
     {
@@ -172,10 +160,13 @@ public class Day15 : IDayProblem
         public List<Coordinate> GetNeighborCoordinates(Coordinate direction)
         {
             HashSet<Coordinate> neighbors = [];
+            HashSet<Coordinate> piece = [];
             foreach(BoxPart part in Parts)
             {
-                neighbors.Add(part.localPosition + direction);
+                piece.Add(part.localPosition);
                 neighbors.Remove(part.localPosition);
+                if (!piece.Contains(part.localPosition + direction))
+                    neighbors.Add(part.localPosition + direction);
             }
             return neighbors.ToList();
         }
@@ -186,10 +177,10 @@ public class Day15 : IDayProblem
         public Coordinate localPosition;
         public Box Parent;
 
-        public BoxPart(Coordinate pos, Box? parent = null)
+        public BoxPart(Coordinate pos)
         {
             localPosition = pos;
-            Parent = parent;
+            Parent = null;
         }
 
         public IEnumerable<Coordinate> GetNeighborCoordinates(Coordinate direction, Coordinate at)
