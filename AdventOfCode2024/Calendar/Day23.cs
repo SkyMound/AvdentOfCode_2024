@@ -43,7 +43,10 @@ public class Day23 : IDayProblem
             {
                 foreach(Computer linkedTo in computer.connectedTo)
                 {
-                    if (linkedTo.connectedTo.Intersect(computer.connectedTo))
+                    // if (linkedTo.connectedTo.Intersect(computer.connectedTo))
+                    // {
+
+                    // }
                 }
             }
         }

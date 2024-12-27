@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 using AdventOfCode2024.Common;
@@ -47,21 +48,21 @@ public class Day14 : IDayProblem
         }
     }
 
-        private static IEnumerable<Robot> GetRobots(string input) 
-    {
-        Regex regex = new Regex(@"-?\d+");
+    //     private static IEnumerable<Robot> GetRobots(string input) 
+    // {
+    //     Regex regex = new Regex(@"-?\d+");
 
-        foreach(string strMachine in input.Split("\n"))
-        {
-            MatchCollection matches = regex.Matches(strMachine);
-            Robot r = new();
-            r.x = int.Parse(matches[0].Value);
-            r.y = int.Parse(matches[1].Value);
-            r.v_x = int.Parse(matches[2].Value);
-            r.v_y = int.Parse(matches[3].Value);
-            yield return r;
-        }
-    }
+    //     foreach(string strMachine in input.Split("\n"))
+    //     {
+    //         MatchCollection matches = regex.Matches(strMachine);
+    //         Robot r = new();
+    //         r.x = int.Parse(matches[0].Value);
+    //         r.y = int.Parse(matches[1].Value);
+    //         r.v_x = int.Parse(matches[2].Value);
+    //         r.v_y = int.Parse(matches[3].Value);
+    //         yield return r;
+    //     }
+    // }
 
     public static string SolvePart1(string input)
     {
@@ -90,7 +91,8 @@ public class Day14 : IDayProblem
         (int bathroomWidth, int bathroomHeight) = (101,103);
         const int MAX_SECONDS = 10000;
 
-        PriorityQueue<int,int> closeness = new();
+        int secondsMin = 0;
+        int distanceMin = int.MaxValue;
 
         IEnumerable<Robot> robots = GetRobots(input);
         for(int seconds = 0; seconds < MAX_SECONDS; ++seconds)
@@ -102,16 +104,49 @@ public class Day14 : IDayProblem
                 int new_y =  (robot.y + (robot.v_y + bathroomHeight) * seconds) % bathroomHeight;
 
                 foreach(Coordinate coord in new Coordinate(new_x, new_y).GetOrthogonals())
-                {
                     adjacentSpaces.Add(coord);
-                }
+
+                if (adjacentSpaces.Count > distanceMin)
+                    break;
             }
-            closeness.Enqueue(seconds, adjacentSpaces.Count);
+
+            if (adjacentSpaces.Count < distanceMin)
+            {
+                Console.WriteLine(seconds);
+                secondsMin = seconds;
+                distanceMin = adjacentSpaces.Count;
+            }
         }
 
-        return closeness.Peek().ToString();
+        Display(robots, secondsMin);
+        return secondsMin.ToString();
     }
 
+
+    private static void Display(IEnumerable<Robot> robots, int seconds)
+    {
+        (int bathroomWidth, int bathroomHeight) = (101,103);
+        List<Robot> rob = robots.ToList();
+        HashSet<Coordinate> robotPosition = [];
+        rob.ForEach(rob => 
+        {
+            robotPosition.Add(new(rob.y + (rob.v_y + bathroomHeight) * seconds % bathroomHeight, rob.x + (rob.v_x + bathroomWidth) * seconds % bathroomWidth));
+            // rob.x += (rob.v_x + bathroomWidth) * seconds % bathroomWidth;
+            // rob.y += (rob.v_y + bathroomWidth) * seconds % bathroomWidth;
+        });
+
+        for(int i = 0; i < bathroomWidth; ++i)
+        {
+            for(int j = 0; j < bathroomHeight; ++j)
+            {
+                if (robotPosition.Contains(new(i,j)))
+                    Console.Write('X');
+                else
+                    Console.Write(' ');
+            }
+            Console.WriteLine('#');
+        }
+    }
     // public static string SolvePart2(string input)
     // {
     //     (int bathroomWidth, int bathroomHeight) = (101,103);
@@ -148,8 +183,4 @@ public class Day14 : IDayProblem
 
     //     return secondsElapsed.ToString();
     // }
-}
-
-internal class MAX_SECONDS
-{
 }
