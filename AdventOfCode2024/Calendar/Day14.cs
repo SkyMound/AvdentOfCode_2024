@@ -1,5 +1,7 @@
 using System;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
+using AdventOfCode2024.Common;
 
 namespace AdventOfCode2024.Calendar;
 
@@ -18,7 +20,34 @@ public class Day14 : IDayProblem
         }
     }
 
+    struct RobotCoord {
+        public Coordinate position;
+        public Coordinate velocity;
+
+        public RobotCoord()
+        {
+            position = new();
+            velocity = new();
+        }
+    }
+
     private static IEnumerable<Robot> GetRobots(string input) 
+    {
+        Regex regex = new Regex(@"-?\d+");
+
+        foreach(string strMachine in input.Split("\n"))
+        {
+            MatchCollection matches = regex.Matches(strMachine);
+            Robot r = new();
+            r.x = int.Parse(matches[0].Value);
+            r.y = int.Parse(matches[1].Value);
+            r.v_x = int.Parse(matches[2].Value);
+            r.v_y = int.Parse(matches[3].Value);
+            yield return r;
+        }
+    }
+
+        private static IEnumerable<Robot> GetRobots(string input) 
     {
         Regex regex = new Regex(@"-?\d+");
 
@@ -59,37 +88,68 @@ public class Day14 : IDayProblem
     public static string SolvePart2(string input)
     {
         (int bathroomWidth, int bathroomHeight) = (101,103);
-        (int middleCol, int middleRow) = (bathroomWidth/2, bathroomHeight/2);
-        (bool ignoreCol, bool ignoreRow) = (bathroomWidth%2!=0, bathroomHeight%2!=0);
-        int[] quardantSafety;
-        int maxSeconds = 10000;
-        int secondsElapsed = 0;
-        do
+        const int MAX_SECONDS = 10000;
+
+        PriorityQueue<int,int> closeness = new();
+
+        IEnumerable<Robot> robots = GetRobots(input);
+        for(int seconds = 0; seconds < MAX_SECONDS; ++seconds)
         {
-            quardantSafety = [0,0,0,0];
-            ++secondsElapsed;
-            foreach(Robot robot in GetRobots(input))
+            HashSet<Coordinate> adjacentSpaces = [];
+            foreach(Robot robot in robots)
             {
-                int new_x =  (robot.x + (robot.v_x + bathroomWidth) * secondsElapsed) % bathroomWidth;
-                int new_y =  (robot.y + (robot.v_y + bathroomHeight) * secondsElapsed) % bathroomHeight;
+                int new_x =  (robot.x + (robot.v_x + bathroomWidth) * seconds) % bathroomWidth;
+                int new_y =  (robot.y + (robot.v_y + bathroomHeight) * seconds) % bathroomHeight;
 
-                if ((ignoreCol && new_x == middleCol) || (ignoreRow && new_y == middleRow))
-                    continue;
-                
-                ++quardantSafety[Convert.ToInt32(new_x < middleCol) + Convert.ToInt32(new_y < middleRow) * 2];
+                foreach(Coordinate coord in new Coordinate(new_x, new_y).GetOrthogonals())
+                {
+                    adjacentSpaces.Add(coord);
+                }
             }
+            closeness.Enqueue(seconds, adjacentSpaces.Count);
+        }
 
-            if(quardantSafety[0] == quardantSafety[1] && quardantSafety[2] == quardantSafety[3])
-            {
-                Console.WriteLine(secondsElapsed);
-                foreach(int i in quardantSafety)
-                    Console.WriteLine(i);
-            }
-
-        }while(secondsElapsed < maxSeconds);
-
-
-
-        return secondsElapsed.ToString();
+        return closeness.Peek().ToString();
     }
+
+    // public static string SolvePart2(string input)
+    // {
+    //     (int bathroomWidth, int bathroomHeight) = (101,103);
+    //     (int middleCol, int middleRow) = (bathroomWidth/2, bathroomHeight/2);
+    //     (bool ignoreCol, bool ignoreRow) = (bathroomWidth%2!=0, bathroomHeight%2!=0);
+    //     int[] quardantSafety;
+    //     int maxSeconds = 10000;
+    //     int secondsElapsed = 0;
+    //     do
+    //     {
+    //         quardantSafety = [0,0,0,0];
+    //         ++secondsElapsed;
+    //         foreach(Robot robot in GetRobots(input))
+    //         {
+    //             int new_x =  (robot.x + (robot.v_x + bathroomWidth) * secondsElapsed) % bathroomWidth;
+    //             int new_y =  (robot.y + (robot.v_y + bathroomHeight) * secondsElapsed) % bathroomHeight;
+
+    //             if ((ignoreCol && new_x == middleCol) || (ignoreRow && new_y == middleRow))
+    //                 continue;
+
+    //             ++quardantSafety[Convert.ToInt32(new_x < middleCol) + Convert.ToInt32(new_y < middleRow) * 2];
+    //         }
+
+    //         if(quardantSafety[0] == quardantSafety[1] && quardantSafety[2] == quardantSafety[3])
+    //         {
+    //             Console.WriteLine(secondsElapsed);
+    //             foreach(int i in quardantSafety)
+    //                 Console.WriteLine(i);
+    //         }
+
+    //     }while(secondsElapsed < maxSeconds);
+
+
+
+    //     return secondsElapsed.ToString();
+    // }
+}
+
+internal class MAX_SECONDS
+{
 }
