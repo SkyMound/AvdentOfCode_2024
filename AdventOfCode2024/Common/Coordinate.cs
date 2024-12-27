@@ -47,4 +47,13 @@ class Coordinate
         foreach(Coordinate offset in Orthogonal)
             yield return this + offset;
     }
+
+    public bool IsWithin<T>(T map)
+    {
+        if (map is Array arr && arr.Rank == 2)
+        {
+            return Row >= 0 && Col >= 0 && Row < arr.GetLength(0) && Col < arr.GetLength(1);
+        }
+        return false;
+    }
 }
